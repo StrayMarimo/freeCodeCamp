@@ -24,7 +24,8 @@ const url = require("url");
 
 app.post("/api/shorturl", function (req, res) {
   const original_url = req.body.url;
-  const hostname = url.parse(original_url).hostname;
+  const parsedUrl = url.parse(original_url);
+  const hostname = parsedUrl.hostname;
 
   dns.lookup(hostname, (err) => {
     if (err) {
