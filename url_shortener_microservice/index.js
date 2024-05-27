@@ -27,7 +27,7 @@ app.post("/api/shorturl", function (req, res) {
   const parsedUrl = url.parse(original_url);
   const hostname = parsedUrl.hostname;
 
-  const urlPattern = /^https:\/\/www\..+/i;
+  const urlPattern = /^https:\/\/(?:www\.)?.+/i;
 
   if (!urlPattern.test(original_url)) {
     return res.json({
