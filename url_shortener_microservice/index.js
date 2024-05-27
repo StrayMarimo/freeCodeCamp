@@ -27,12 +27,9 @@ app.post("/api/shorturl", function (req, res) {
   const parsedUrl = url.parse(original_url);
   const hostname = parsedUrl.hostname;
 
-  const urlPattern = /^https:\/\/(?:www\.)?.+/i;
-
-  if (!urlPattern.test(original_url)) {
-    return res.json({
-      error: "invalid url'",
-    });
+  httpRegex = /^(http|https)(:\/\/)/;
+  if (!httpRegex.test(original_url)) {
+    return res.json({ error: "invalid url" });
   }
   dns.lookup(hostname, (err) => {
     if (err) {
@@ -52,7 +49,7 @@ app.get("/api/shorturl/:shortUrl", function (req, res) {
   if (original_url) {
     res.redirect(original_url);
   } else {
-    res.status(404).json({ error: "Short URL not found" });
+    res.status(404).json({ error: "invalid url" });
   }
 });
 
