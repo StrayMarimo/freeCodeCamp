@@ -11,13 +11,7 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", () => console.log("Connected to MongoDB"));
+mongoose.connect(process.env.MONGO_URI);
 
 // Create an Exercise model
 const exerciseSchema = new mongoose.Schema({
@@ -36,7 +30,6 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
-
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
@@ -57,7 +50,7 @@ app.get("/api/users", async (req, res) => {
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const userId = req.params._id;
   const { description, duration, date } = req.body;
-  let dateString = ""
+  let dateString = "";
   if (!date) {
     dateString = new Date().toDateString();
   } else {
@@ -87,7 +80,7 @@ app.get("/api/users/:_id/logs", async (req, res) => {
   const from = req.query.from;
   const to = req.query.to;
   const userId = req.params._id;
-  
+
   const user = await User.findById(userId).populate("log");
   const count = user.log.length;
   let log = user.log.map((exercise) => ({
@@ -106,7 +99,9 @@ app.get("/api/users/:_id/logs", async (req, res) => {
 
   if (from && to) {
     log = log.filter(
-      (exercise) => new Date(exercise.date) <= new Date(to) && new Date(exercise.date) >= new Date(from)
+      (exercise) =>
+        new Date(exercise.date) <= new Date(to) &&
+        new Date(exercise.date) >= new Date(from)
     );
   }
 
