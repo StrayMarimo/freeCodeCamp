@@ -76,9 +76,6 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 });
 
 app.get("/api/users/:_id/logs", async (req, res) => {
-  const limit = req.query.limit;
-  const from = req.query.from;
-  const to = req.query.to;
   const userId = req.params._id;
 
   const user = await User.findById(userId).populate("log");
@@ -89,20 +86,16 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     date: new Date(exercise.date).toDateString(),
   }));
 
-  if (limit) {
-    log = log.slice(0, limit);
-  }
-
-  if (from) {
-    log = log.filter((exercise) => new Date(exercise.date) >= new Date(from));
-  }
-
-  if (from && to) {
+  if (req.query.from && req.query.to) {
     log = log.filter(
-      (exercise) =>
-        new Date(exercise.date) <= new Date(to) &&
-        new Date(exercise.date) >= new Date(from)
+      (d) =>
+        Date.parse(d.date) >= Date.parse(req.query.from) &&
+        Date.parse(d.date) <= Date.parse(req.query.to)
     );
+  }
+
+  if (req.query.limit) {
+    log = log.filter((d, i) => i < req.query.limit);
   }
 
   res.json({
